@@ -106,9 +106,15 @@ void System::systemRun()
 				showAllSellers();
 				break;
 			case 10:
-				getTheNameOfTheProduct();
+				showAllBuyersAndSellers();
 				break;
 			case 11:
+				showAllUsersOfCertainType();
+				break;
+			case 12:
+				getTheNameOfTheProduct();
+				break;
+			case 13:
 				break;
 			default:
 				break;
@@ -130,8 +136,10 @@ static void printMenu()
 	cout << "To pay for order PRESS 7" << endl;
 	cout << "To show all buyers PRESS 8" << endl;
 	cout << "To show all sellers PRESS 9" << endl;
-	cout << "To search for products PRESS 10" << endl;
-	cout << "For EXIT PRESS 11" << endl;
+	cout << "To show all buyers and sellers PRESS 10" << endl;
+	cout << "To show all users of certain type PRESS 11" << endl;
+	cout << "To search for products PRESS 12" << endl;
+	cout << "For EXIT PRESS 13" << endl;
 }
 
 static bool checkChoice(int choice)
@@ -173,6 +181,15 @@ int System::logIn(char* userName, char* passWord, int& index)//	THE LOGIN FUNCTI
 		}
 		return SELLER;
 	}
+	else if (checkIfUserNameExist(userName, index) == BUYER_AND_SELLER)
+	{
+		if (!checkIfUserPasswordCorrect(index, passWord))
+		{
+			cout << "Password is incorrect  " << endl;
+			return NONE;
+		}
+		return BUYER_AND_SELLER;
+	}
 	else//username dosent exist 
 	{
 		cout << "Username dosent exist" << endl;
@@ -188,8 +205,14 @@ int System::checkIfUserNameExist(char* userName, int& index)//runs on both selle
 		if (strcmp(userName, usersArray[i]->getUserName()) == 0)
 		{
 			index = i;
-			return SELLER;
+			if (typeid(this->usersArray[i]) == typeid(Buyer))
+				return BUYER;
+			else if (typeid(this->usersArray[i]) == typeid(Seller))
+				return SELLER;
+			else
+				return BUYER_AND_SELLER;
 		}
+		return NONE;
 	}
 
 	for (i = 0; i < this->logicSizeOfUsersArray; i++) // check if buyer
@@ -217,13 +240,26 @@ bool System::checkIfUserPasswordCorrect(int index, char* password)
 
 void System::addNewBuyer()
 {
+	bool onlyBuyer = true;
 	char tempName[MAX_LENGTH];
 	char tempPassword[PASSWORD_LENGTH];//const
 	Address* tempAddress;
 
-	tempAddress = getInfoForNewAllocationOfSellerOrBuyer(tempName, tempPassword);//copy ctor 
-	Buyer tempBuyer(tempName, tempPassword, tempAddress);
-	(*this) += tempBuyer;//add buyer to the usersArray
+	cout << "If you want to be also seller press 0, else press 1" << endl;
+	cin >> onlyBuyer;
+	
+	tempAddress = getInfoForNewAllocationOfSellerOrBuyer(tempName, tempPassword);//copy ctor
+	if (!onlyBuyer)
+	{
+		BuyerAndSeller tempBuyerSeller(Buyer(tempName, tempPassword, tempAddress), Seller(tempName, tempPassword, tempAddress));
+		(*this) += tempBuyerSeller;//add buyer and seller to the usersArray
+	}
+	else
+	{
+		Buyer tempBuyer(tempName, tempPassword, tempAddress);
+		(*this) += tempBuyer;//add buyer to the usersArray
+	}
+	
 }
 
 void System::allocateForNewUser()
@@ -278,14 +314,9 @@ Address* System::getInfoForNewAllocationOfSellerOrBuyer(char* tempName, char*  t
 bool System::checkIfNameIsTaken(char* name)//checks if the new register can use the username he chose or not.
 {
 	int i;
-	for (i = 0; i < logicSizeOfSellersArray; i++) //check if name is taken by other seller
+	for (i = 0; i < logicSizeOfUsersArray; i++) //check if name is taken by other user
 	{
-		if (strcmp(name, sellersArray[i]->getUserName()) == 0)
-			return false;
-	}
-	for (i = 0; i < logicSizeOfBuyersArray; i++) // check if name is taken by other buyer
-	{
-		if (strcmp(name, buyersArray[i]->getUserName()) == 0)
+		if (strcmp(name, usersArray[i]->getUserName()) == 0)
 			return false;
 	}
 	return true;
@@ -306,7 +337,7 @@ static bool checkLettersAndNumbersOnly(char* str)
 static bool passwordInCorrectLength(char* pass)
 {
 	int size = strlen(pass);
-	if (size == 8)
+	if (size == PASSWORD_LENGTH-1)
 		return true;
 	return false;
 }
@@ -380,33 +411,26 @@ static bool isHouseNumberLegal(int num)
 
 void System::addNewSeller()
 {
+	bool onlySeller = false;
 	char tempName[MAX_LENGTH];
 	char tempPassword[PASSWORD_LENGTH];
 	Address* tempAddress;
 
 	tempAddress = getInfoForNewAllocationOfSellerOrBuyer(tempName, tempPassword);
-	allocateForNewSeller();
-	if (logicSizeOfSellersArray == 1)//allocate
-		sellersArray = new Seller*[physicSizeOfSellersArray];
-	sellersArray[logicSizeOfSellersArray - 1] = new Seller(tempName, tempPassword, tempAddress);//ctor of seller
-}
+	
+	cout << "If you want to be also buyer press 0, else press 1" << endl;
+	cin >> onlySeller;
 
-void System::allocateForNewSeller()
-{
-	int i;
-	Seller** tempArray;
-	if (logicSizeOfSellersArray == physicSizeOfSellersArray)
+	if (!onlySeller)
 	{
-		physicSizeOfSellersArray *= 2;
-		tempArray = new Seller*[physicSizeOfSellersArray];//c'tor
-		for (i = 0; i < logicSizeOfSellersArray; i++)
-			tempArray[i] = new Seller(*(this->sellersArray[i]));
-		for (i = 0; i < logicSizeOfSellersArray; i++)
-			delete sellersArray[i];
-		delete[]sellersArray;
-		sellersArray = tempArray;
+		BuyerAndSeller tempBuyerSeller(Buyer(tempName, tempPassword, tempAddress), Seller(tempName, tempPassword, tempAddress));
+		(*this) += tempBuyerSeller;//add buyer and seller to the usersArray
 	}
-	logicSizeOfSellersArray++;
+	else
+	{
+		Seller tempSeller(tempName, tempPassword, tempAddress);
+		(*this) += tempSeller;//add seller to the usersArray	
+	}
 }
 
 
@@ -419,10 +443,10 @@ void System::addProductToSeller() // seif 3
 	connected = logIn(userName, passWord, indexOfSeller);
 	if (connected == BUYER  )	
 		cout << "Only seller can add new Product !" << endl;
-	else if (connected == SELLER)//connected to seller 
+	else if (connected == SELLER || connected == BUYER_AND_SELLER)//connected to seller 
 	{
-		Product product = Product(insertInfoForProduct(sellersArray[indexOfSeller]));
-		sellersArray[indexOfSeller]->AddToProductList(product);
+		Product product = Product(insertInfoForProduct(((Seller**)usersArray)[indexOfSeller]));
+		(((Seller**)usersArray)[indexOfSeller])->AddToProductList(product);
 	}	
 }
 
@@ -435,8 +459,18 @@ Product System::insertInfoForProduct(Seller* pSeller)
 	cin.getline(name, MAX_LENGTH);
 	cout << "Please choose product category: "<< endl << "for children press 0 " << endl << "for Electricty press 1" << endl << "for Clothing press 2 " << endl << "for  Office press 3 " << endl;
 	cin >> category;
+	while (category != 0 && category != 1 && category != 2 && category != 3)
+	{
+		cout << "Category incorrect, please enter again: " << endl;
+		cin >> category;
+	}
 	cout << "Please enter the price of the product: " << name << endl;
 	cin >> price;
+	while (price < 0)
+	{
+		cout << "Price is illegal, please enter again: " << name << endl;
+		cin >> price;
+	}
 	return (Product (name, Product::eCategory(category), price, pSeller));//returns as product--ctor
 }
 
@@ -456,15 +490,20 @@ void System::addFeedBackToSeller() //seif 4
 		cout << "Only Buyer can add feedback !" << endl;
 	else
 	{
-		logSizeofOrderCart = this->buyersArray[indexOfBuyer]->getLogSizeOfOrderCart();
-		orderCart = new Order*[logSizeofOrderCart];
-		for (i = 0; i < logSizeofOrderCart; i++)
+		logSizeofOrderCart = (((Buyer**)usersArray)[indexOfBuyer])->getLogSizeOfOrderCart();
+		if (logSizeofOrderCart == 0)
+			cout << "You must purchase product before adding feedback" << endl;
+		else
 		{
-			orderCart[i] = buyersArray[indexOfBuyer]->GetOrderCart()[i];
+			orderCart = new Order*[logSizeofOrderCart];
+			for (i = 0; i < logSizeofOrderCart; i++)
+			{
+				orderCart[i] = (((Buyer**)usersArray)[indexOfBuyer])->GetOrderCart()[i];
+			}
+			Seller* seller = chooseSellerForFeedBack(orderCart, logSizeofOrderCart);
+			if (seller != NULL)
+				createFeedBack(seller, userName);
 		}
-		Seller* seller = chooseSellerForFeedBack(orderCart, logSizeofOrderCart);
-		if (seller != NULL)
-			createFeedBack(seller, userName);
 	}
 }
 
@@ -483,6 +522,8 @@ Seller* System::chooseSellerForFeedBack(Order** orderCart, int& size)
 		productList = orderCart[orderIndex]->getProductsArray();
 		return productList[productIndex]->getSeller();
 	}
+	else
+		cout << "Product has not been found" << endl;
 	return NULL;
 }
 
@@ -576,7 +617,7 @@ void System::addProductToShoppingCart()//seif 5
 		cout << "Could not connect to your account" << endl;
 	else if (connected == SELLER)
 		cout << "Only buyer can add products to his shopping cart ! " << endl;
-	else
+	else //you are buyer or buyer and seller
 	{
 		cout << "Please enter the name of the seller: " << endl;
 		cin.getline(SellerName, MAX_LENGTH);
@@ -586,25 +627,23 @@ void System::addProductToShoppingCart()//seif 5
 		indexOfSeller = searchForSeller(SellerName);
 		if (indexOfSeller != NONE)
 		{
-			product = new Product(searchForProductOfSpecificSeller(productName, *(sellersArray[indexOfSeller])));
-			this->buyersArray[indexOfBuyer]->AddToShoppingCart(*product);//adding the product to the exact buyer who is currently using the system(logged In)
+			product = new Product(searchForProductOfSpecificSeller(productName, *(((Seller**)usersArray)[indexOfSeller])));
+			(((Buyer**)usersArray)[indexOfBuyer])->AddToShoppingCart(*product);//adding the product to the exact buyer who is currently using the system(logged In)
 			delete product;
 		}
+		else
+			cout << "Seller has not been found" << endl;
 	}
 }
 
 int System::searchForSeller(char* name)
 {
 	int index = NONE;
-	for (int i = 0; i < logicSizeOfSellersArray; i++)
+	for (int i = 0; i < logicSizeOfUsersArray; i++)
 	{
-
-		if (strcmp(name, this->sellersArray[i]->getUserName()) == 0)
+		if (strcmp(name, this->usersArray[i]->getUserName()) == 0)
 			index = i;
 	}
-	if (index == NONE)
-		cout << "There is no such seller" << endl;
-
 	return index;
 }
 
@@ -618,10 +657,9 @@ Product System::searchForProductOfSpecificSeller(char* productName, Seller selle
 			index = i;
 	if (index == -1)
 	{
-		cout << "No such product exist in the cart of this seller " << endl;
+		cout << "Product doesnt exist for this seller " << endl;
 		exit(-1);
 	}
-
 	return *(productList[index]);
 }
 
@@ -639,17 +677,17 @@ void System::MakeAnOrder()//seif 6
 		cout << "Could not log in" << endl;
 	else if (connected == SELLER)
 		cout << "Only buyer can make an order! " << endl;
-	else
+	else //you are buyer or buyer and seller
 	{
-		sizeOfShoppingCart = this->buyersArray[indexOfBuyer]->getLogSizeOfShoppingCart();
+		sizeOfShoppingCart = (((Buyer**)usersArray)[indexOfBuyer])->getLogSizeOfShoppingCart();
 		if (sizeOfShoppingCart == 0)
 			cout << "No products in shopping cart" << endl;
-		else if (this->buyersArray[indexOfBuyer]->getOrder() != NULL)
+		else if ((((Buyer**)usersArray)[indexOfBuyer])->getOrder() != NULL)
 			cout << "The last order is not completed" << endl;
-		else
+		else //you can start the order
 		{
-			ShoppingCart = buyersArray[indexOfBuyer]->getShoppingCart();
-			addChosenProductsToOrder(sizeOfShoppingCart, buyersArray[indexOfBuyer]);
+			ShoppingCart = (((Buyer**)usersArray)[indexOfBuyer])->getShoppingCart();
+			addChosenProductsToOrder(sizeOfShoppingCart, (((Buyer**)usersArray)[indexOfBuyer]));
 		}
 	}
 }
@@ -714,11 +752,13 @@ void System::payForOrder() //seif 7
 		cout << "Could not log in" << endl;
 	else if (connected == SELLER)
 		cout << "Only buyer can make an order! " << endl;
-	else
+	else //you are buyer or buyer and seller
 	{
-		order = buyersArray[indexOfBuyer]->getOrder();
+		order = (((Buyer**)usersArray)[indexOfBuyer])->getOrder();
 		if (order != NULL)
-			finishOrder(order, buyersArray[indexOfBuyer]);
+			finishOrder(order, (((Buyer**)usersArray)[indexOfBuyer]));
+		else
+			cout << "You payed for all your orders :)" << endl;
 	}
 }
 
@@ -743,23 +783,54 @@ void System::finishOrder(Order* order, Buyer* buyer)
 
 void System::showAllBuyers()//seif 8
 {
-	if (this->logicSizeOfBuyersArray == 0)
-		cout << "No buyers" << endl;
-	for (int i = 0; i < this->logicSizeOfBuyersArray; i++)
-		cout << "Username number :" << i + 1 << "'s buyer is :" << this->buyersArray[i]->getUserName() << " and his password is : " << this->buyersArray[i]->getPassword() << endl;
+	if (this->logicSizeOfUsersArray == 0)
+		cout << "No users" << endl;
+	for (int i = 0; i < this->logicSizeOfUsersArray; i++)
+	{
+		if (typeid(this->usersArray[i]) == typeid(Buyer)) 
+			cout << "Username number :" << i + 1 << "'s buyer is :" << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
+	}
 }
 
 
 void System::showAllSellers()//seif 9 
 {
-	if (this->logicSizeOfSellersArray == 0)
-		cout << "No sellers" << endl;
-	for (int i = 0; i < this->logicSizeOfSellersArray; i++)
-		cout << "Username number :" << i + 1 << "'s seller is :" << this->sellersArray[i]->getUserName() << " and his password is : " << this->sellersArray[i]->getPassword() << endl;
+	if (this->logicSizeOfUsersArray == 0)
+		cout << "No users" << endl;
+	for (int i = 0; i < this->logicSizeOfUsersArray; i++)
+	{
+		if (typeid(this->usersArray[i]) == typeid(Seller))
+			cout << "Username number :" << i + 1 << "'s seller is :" << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
+	}
 }
 
+void System::showAllBuyersAndSellers()//seif 10
+{
+	if (this->logicSizeOfUsersArray == 0)
+		cout << "No users" << endl;
+	for (int i = 0; i < this->logicSizeOfUsersArray; i++)
+	{
+		if (typeid(this->usersArray[i]) == typeid(BuyerAndSeller))
+			cout << "Username number :" << i + 1 << "'s buyer and seller is :" << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
+	}
+}
 
-void System::getTheNameOfTheProduct()// seif 10
+void System::showAllUsersOfCertainType()//seif 11
+{
+	int user;
+	cout << "Please enter the users you are looking for: \n" <<  "0 for sellers \n" << "1 for buyers \n" << "2 for buyer and sellers " << endl;
+	cin >> user;
+	if (user == SELLER)
+		showAllSellers();
+	else if (user == BUYER)
+		showAllBuyers();
+	else if (user == BUYER_AND_SELLER)
+		showAllBuyersAndSellers();
+	else
+		cout << "Your choice is illegal" << endl;
+}
+
+void System::getTheNameOfTheProduct()// seif 12
 {
 	char productName[MAX_LENGTH];
 
@@ -770,20 +841,19 @@ void System::getTheNameOfTheProduct()// seif 10
 
 void System::SearchForProductExistence(char* productName) 
 {
-	for (int i = 0; i < this->logicSizeOfSellersArray; i++)
+	for (int i = 0; i < this->logicSizeOfUsersArray; i++)
 	{
-		Product** productListTemp = new Product*[this->sellersArray[i]->getPhysicListProductSize()];
-		productListTemp = this->sellersArray[i]->getListOfProducts();
-		for (int j = 0; j < this->sellersArray[i]->getLogListProductSize(); j++)
+		Product** productListTemp = new Product*[(((Seller**)usersArray)[i])->getPhysicListProductSize()];
+		productListTemp = (((Seller**)usersArray)[i])->getListOfProducts();
+		for (int j = 0; j < (((Seller**)usersArray)[i])->getLogListProductSize(); j++)
 		{
 			if (strcmp(productName, productListTemp[j]->getName()) == 0)//checks if found a product with the exact name 
-				cout << "The Seller number is : " << i + 1 << ", which his name is: " << this->sellersArray[i]->getUserName() << " has the product !" << endl;
+				cout << "The Seller number is : " << i + 1 << ", which his name is: " << this->usersArray[i]->getUserName() << " has the product, the price is: " << productListTemp[j]->getPrice() << endl;
 			else
 				cout << "The product has not been found" << endl;
 		}
 	}
 }
-
 
 
 void System::operator+=(const Buyer& other)//might be a prob because of & 
@@ -794,7 +864,7 @@ void System::operator+=(const Buyer& other)//might be a prob because of &
 	this->getUsersArray[logicSizeOfUsersArray - 1] = other;
 }
 
-void System::operator+=(const Seller*& other)
+void System::operator+=(const Seller& other)
 {
 	this->allocateForNewUser();//allocation
 	if (logicSizeOfUsersArray == 1)//allocate
@@ -802,10 +872,11 @@ void System::operator+=(const Seller*& other)
 	this->getUsersArray[logicSizeOfUsersArray - 1] = other;
 }
 
-void System::operator+=(const BuyerAndSeller*& other)
+void System::operator+=(const BuyerAndSeller& other)
 {
 	this->allocateForNewUser();//allocation
 	if (logicSizeOfUsersArray == 1)//allocate
 		usersArray = new User*[physicSizeOfUsersArray];
 	this->getUsersArray[logicSizeOfUsersArray - 1] = other;
 }
+

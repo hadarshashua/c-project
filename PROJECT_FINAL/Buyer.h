@@ -16,7 +16,7 @@ class Buyer: virtual public User
 {
 private:
 	Order* order;
-	Order** orderCart;////array of Past Orders of the buyer . 
+	Order** orderCart;//array of Past Orders of the buyer 
 	Product** shoppingCart;//array of products
 	int logSizeOfShoppingCart, physicSizeOfShoppingCart;
 	int logSizeOfOrderCart, physicSizeOfOrderCart;

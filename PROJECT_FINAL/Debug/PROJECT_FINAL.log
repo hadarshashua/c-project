@@ -1,3 +1,25 @@
 ﻿  E-CommerceSystem.cpp
-  PROJECT_FINAL.vcxproj -> C:\Users\hadar\Documents\Visual Studio 2015\Projects\PROJECT_FINAL\Debug\PROJECT_FINAL.exe
-  PROJECT_FINAL.vcxproj -> C:\Users\hadar\Documents\Visual Studio 2015\Projects\PROJECT_FINAL\Debug\PROJECT_FINAL.pdb (Full PDB)
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(263): error C2664: 'Seller::Seller(Seller &&)': cannot convert argument 1 from 'User' to 'const Seller &'
+  c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(263): note: Reason: cannot convert from 'User' to 'const Seller'
+  c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(263): note: No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(265): error C2664: 'Buyer::Buyer(Buyer &&)': cannot convert argument 1 from 'User' to 'const Buyer &'
+  c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(265): note: Reason: cannot convert from 'User' to 'const Buyer'
+  c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(265): note: No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(267): error C2664: 'BuyerAndSeller::BuyerAndSeller(const BuyerAndSeller &)': cannot convert argument 1 from 'User' to 'const BuyerAndSeller &'
+  c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(267): note: Reason: cannot convert from 'User' to 'const BuyerAndSeller'
+  c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(267): note: No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(838): error C3867: 'System::getUsersArray': non-standard syntax; use '&' to create a pointer to member
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(838): error C2109: subscript requires array or pointer type
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(846): error C2440: '=': cannot convert from 'const Seller' to 'User *'
+  c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(846): note: No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(854): error C3867: 'System::getUsersArray': non-standard syntax; use '&' to create a pointer to member
+c:\users\hadar\desktop\hadar\מכללה\שנה ב\תכנות מכוון עצמים\project_final\project_final\e-commercesystem.cpp(854): error C2109: subscript requires array or pointer type
+  Generating Code...
+  Compiling...
+  Buyer.cpp
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  main.cpp
+  Seller.cpp
+  FeedBack.cpp
+  BuyerAndSeller.cpp

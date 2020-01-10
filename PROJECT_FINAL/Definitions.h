@@ -7,6 +7,7 @@
 #define MAX_FEEDBACK_LENGTH 200
 #define SELLER 0
 #define BUYER 1
+#define BUYER_AND_SELLER 2
 #define NONE -1
 
 

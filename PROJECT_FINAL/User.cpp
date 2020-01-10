@@ -1,8 +1,8 @@
 #include "User.h"
 
-static bool checkLettersAndNumbersOnly(char* str);
-static bool userNameAboveMinSize(char* name);
-static bool passwordInCorrectLength(char* pass);
+static bool checkLettersAndNumbersOnly(const char* str);
+static bool userNameAboveMinSize(const char* name);
+static bool passwordInCorrectLength(const char* pass);
 
 User::User(const char* userName, const char* password, const Address* address)//constructor
 {
@@ -47,9 +47,9 @@ bool User::setUserName(const char* name)
 
 bool User::setPassword(const char* password)
 {
-	if (checkLettersAndNumbersOnly(password) && passwordInCorrectLength(passWord)) //checks that the password is right by the rules
+	if (checkLettersAndNumbersOnly(password) && passwordInCorrectLength(password)) //checks that the password is right by the rules
 	{
-		strcpy(this->password, passWord);
+		strcpy(this->password, password);
 		return true;
 	}
 	return false; //Didnt pass the check (and the dinamic string (TempPassWord) will be released afterwards)
@@ -98,11 +98,7 @@ static bool userNameAboveMinSize(const char* name)
 static bool passwordInCorrectLength(const char* pass)
 {
 	int size = strlen(pass);
-	if (size == 8)
+	if (size == PASSWORD_LENGTH-1)
 		return true;
 	return false;
 }
-
-
-
-void operator+=(const Buyer* other, User** usersArray, int logSize);

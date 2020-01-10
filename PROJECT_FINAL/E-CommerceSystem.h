@@ -43,8 +43,7 @@ public:
 	Address addressInfo();
 
 	void addNewSeller(); //seif 2
-	void allocateForNewSeller();
-
+	
 	void addProductToSeller();//seif 3
 	Product insertInfoForProduct(Seller* pSeller);
 
@@ -68,7 +67,11 @@ public:
 
 	void showAllSellers();// seif 9
 
-	void getTheNameOfTheProduct();//seif 10 
+	void showAllBuyersAndSellers();//seif 10
+
+	void showAllUsersOfCertainType();//seif 11
+
+	void getTheNameOfTheProduct(); //seif 12
 	void SearchForProductExistence(char* productName);
 
 
@@ -77,8 +80,8 @@ public:
 
 
 	void operator+=(const Buyer& other);
-	void operator+=(const Seller*& other);
-	void operator+=(const BuyerAndSeller*& other);
+	void operator+=(const Seller& other);
+	void operator+=(const BuyerAndSeller& other);
 
 };
 
