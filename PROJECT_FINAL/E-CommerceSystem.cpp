@@ -273,11 +273,11 @@ void System::allocateForNewUser()
 		for (i = 0; i < logicSizeOfUsersArray; i++)
 		{
 			if(typeid(this->usersArray[i]) == typeid(Seller))
-			tempArray[i] = new Seller(*(this->usersArray[i]));
+				tempArray[i] = new Seller(*((Seller**)usersArray)[i]);
 			if (typeid(this->usersArray[i]) == typeid(Buyer))
-				tempArray[i] = new Buyer(*(this->usersArray[i]));
+				tempArray[i] = new Buyer(*((Buyer**)usersArray)[i]);
 			if (typeid(this->usersArray[i]) == typeid(BuyerAndSeller))
-				tempArray[i] = new BuyerAndSeller(*(this->usersArray[i]));
+				tempArray[i] = new BuyerAndSeller(*((BuyerAndSeller**)usersArray)[i]);
 		}
 		for (i = 0; i < logicSizeOfUsersArray; i++)
 			delete usersArray[i];
@@ -861,7 +861,7 @@ void System::operator+=(const Buyer& other)//might be a prob because of &
 	this->allocateForNewUser();//allocation
 	if (logicSizeOfUsersArray == 1)//allocate
 		usersArray = new User*[physicSizeOfUsersArray];
-	this->getUsersArray[logicSizeOfUsersArray - 1] = other;
+	this->usersArray[logicSizeOfUsersArray - 1] = new Buyer(other);
 }
 
 void System::operator+=(const Seller& other)
@@ -869,7 +869,7 @@ void System::operator+=(const Seller& other)
 	this->allocateForNewUser();//allocation
 	if (logicSizeOfUsersArray == 1)//allocate
 		usersArray = new User*[physicSizeOfUsersArray];
-	this->getUsersArray[logicSizeOfUsersArray - 1] = other;
+	this->usersArray[logicSizeOfUsersArray - 1] = new Seller(other);
 }
 
 void System::operator+=(const BuyerAndSeller& other)
@@ -877,6 +877,6 @@ void System::operator+=(const BuyerAndSeller& other)
 	this->allocateForNewUser();//allocation
 	if (logicSizeOfUsersArray == 1)//allocate
 		usersArray = new User*[physicSizeOfUsersArray];
-	this->getUsersArray[logicSizeOfUsersArray - 1] = other;
+	this->usersArray[logicSizeOfUsersArray - 1] = new BuyerAndSeller(other);
 }
 
