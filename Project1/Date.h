@@ -16,7 +16,7 @@ private:
 
 public:
 	Date() = default;
-	Date(int day, int month, int year);	//constructor
+	Date(const int& day,const  int& month,const int& year);	//constructor
 	Date(const Date& other); // copy c'tor
 
 	bool setDay(int day);

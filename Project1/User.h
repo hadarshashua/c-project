@@ -18,10 +18,10 @@ private:
 	Address* address;// by pointer
 
 public:
-	User(const char* userName, const char* password, const Address* address);//constructor
+	User(char* userName, const char* password, Address* address);//constructor
 	User(const User& Other);//copy c'tor
 	User(User&& Other);//move c'tor
-	virtual ~User();//destructor---virtual to activate aswell d'tor of buyer or and seller 
+	virtual ~User();
 
 	bool setUserName(const char* name);
 	bool setPassword(const char* password);
@@ -30,10 +30,6 @@ public:
 	const char* getUserName() const;
 	const char* getPassword() const;
 	Address* getAddress() const;
-
-	//virtual const Buyer& operator>(const Buyer& other) = 0;//comparing between two buyers cart-using virtual to move to the operator in the Buyer class 
-	//virtual const Buyer& operator+=(const Buyer& other)=0;//add buyer in array--need to check if its zero or something else 
-	//virtual Seller* operator+=(const Seller& other)=0;//add seller in array 
 };
 
 #endif // !User_H

@@ -40,7 +40,7 @@ public:
 	int getLogSizeOfFeedbackArray() const;
 	int getPhysicSizeOfFeedbackArray() const;
 
-	void AddToProductList(Product newProduct);
+	void AddToProductList(Product& newProduct);
 	void allocateProductArray();
 	void allocateForNewFeedback();
 	void addFeedbackToSeller(FeedBack feedback);

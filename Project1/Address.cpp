@@ -96,7 +96,7 @@ bool isStrCorrect(char* str)
 
 bool isLetter(char c)
 {
-	if ((c > 64 && c < 91) || (c > 97) && (c < 123)) // c is capital letter or small letter
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a') && (c <= 'z')) // c is capital letter or small letter
 		return true;
 	return false;
 }

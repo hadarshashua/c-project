@@ -1,6 +1,7 @@
 #ifndef ECommercySystem_H
 #define ECommercySystem_H
 #pragma warning(disable : 4996)
+
 #include <ostream>
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +11,7 @@ using namespace std;
 #include "Definitions.h"
 #include "Seller.h"
 #include "BuyerAndSeller.h"
-//#include "Address.h"
-//#include "Date.h"
-//#include "FeedBack.h"
+
 class System
 {
 private:
@@ -20,7 +19,6 @@ private:
 	int logicSizeOfUsersArray, physicSizeOfUsersArray;
 
 public:
-	//System() = default;
 	System(User** usersArray = NULL, int logicSizeOfUsersArray = 0, int physicSizeOfUsersArray = 1); //constructor
 	~System(); //destructor
 
@@ -56,7 +54,7 @@ public:
 
 	void addProductToShoppingCart(); //seif 5
 	int searchForSeller(char* name);
-	Product searchForProductOfSpecificSeller(char* productName, Seller seller);
+	Product* searchForProductOfSpecificSeller(char* productName, Seller* seller);
 
 	void MakeAnOrder();//seif 6 
 	void addChosenProductsToOrder(int shoppingCartSize, Buyer* buyer);
@@ -79,20 +77,11 @@ public:
 	void checkOperators();//seif 13
 	void testOperatorCout();
 	void testOperatorCompare();
+	void printTest(Buyer& buyerOne, Buyer& buyerTwo);
 
-
-
-	void operator+=(const Buyer& other);
-	void operator+=(const Seller& other);
-	void operator+=(const BuyerAndSeller& other);
-
-
-	//friend std::ostream& operator<<(ostream& os, const Date& date);
-	//friend std::ostream& operator<<(ostream& os, const Address& address);
-	//friend std::ostream& operator<<(ostream& os, const FeedBack& feedback);
-	//friend ostream& operator<<(ostream& os, const Address& address);
-	//friend ostream& operator<<(ostream& os, const Date& date);
-	//friend ostream& operator<<(ostream& os, const FeedBack& feedback);
+	void operator+=(const Buyer& other);//Add new buyer to users array
+	void operator+=(const Seller& other);//Add new seller to users array
+	void operator+=(const BuyerAndSeller& other);//Add new buyer seller to users array
 
 };
 

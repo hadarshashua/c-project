@@ -7,14 +7,10 @@
 class BuyerAndSeller : public Buyer, public Seller
 {
 public:
-	BuyerAndSeller( char* userName, char* password,  Address* address);//constructor
-	BuyerAndSeller(const BuyerAndSeller& other);//copy c'tor
-	//we should do move ctor?
-	//dont think we need to make our own destructor --- it will be default?
-	
+	BuyerAndSeller( char* userName, char* password, Address* address);//constructor
+	BuyerAndSeller(const BuyerAndSeller& other);//copy c'tor	
 	BuyerAndSeller(BuyerAndSeller&& other);//move c'tor
-	~BuyerAndSeller();//gonna be VIRTUAL !!!! ???????
-	
+	~BuyerAndSeller();	
 };
 
 #endif // ! BuyerAndSeller_H

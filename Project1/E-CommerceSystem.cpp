@@ -24,7 +24,7 @@ System::~System() //destructor
 	int i;
 	for (i = 0; i < this->logicSizeOfUsersArray; i++)
 		delete usersArray[i];
-	//delete[] usersArray; //we have a problem here
+	delete[] usersArray;
 }
 
 
@@ -166,8 +166,9 @@ int System::logIn(char* userName, char* passWord, int& index)//	THE LOGIN FUNCTI
 {
 	cout << "Please enter your user name: " << endl;
 	cin.getline(userName, MAX_LENGTH);
+	int user = checkIfUserNameExist(userName, index);
 
-	if (checkIfUserNameExist(userName, index) == BUYER)//check if username exist
+	if (user == BUYER)//check if username exist
 	{
 		if (!checkIfUserPasswordCorrect(index, passWord))
 		{
@@ -176,7 +177,7 @@ int System::logIn(char* userName, char* passWord, int& index)//	THE LOGIN FUNCTI
 		}
 		return BUYER;
 	}
-	else if (checkIfUserNameExist(userName, index) == SELLER)
+	else if (user == SELLER)
 	{
 		if (!checkIfUserPasswordCorrect(index, passWord))
 		{
@@ -185,7 +186,7 @@ int System::logIn(char* userName, char* passWord, int& index)//	THE LOGIN FUNCTI
 		}
 		return SELLER;
 	}
-	else if (checkIfUserNameExist(userName, index) == BUYER_AND_SELLER)
+	else if (user == BUYER_AND_SELLER)
 	{
 		if (!checkIfUserPasswordCorrect(index, passWord))
 		{
@@ -209,15 +210,15 @@ int System::checkIfUserNameExist(char* userName, int& index)//runs on both selle
 		if (strcmp(userName, usersArray[i]->getUserName()) == 0)
 		{
 			index = i;
-			if (typeid(this->usersArray[i]) == typeid(Buyer))
+			if (typeid(*usersArray[i]) == typeid(Buyer))
 				return BUYER;
-			else if (typeid(this->usersArray[i]) == typeid(Seller))
+			else if (typeid(*usersArray[i]) == typeid(Seller))
 				return SELLER;
 			else
 				return BUYER_AND_SELLER;
-		}
-		return NONE;
+		}		
 	}
+	return NONE;
 
 	for (i = 0; i < this->logicSizeOfUsersArray; i++) // check if buyer
 	{
@@ -244,45 +245,51 @@ bool System::checkIfUserPasswordCorrect(int index, char* password)
 
 void System::addNewBuyer()
 {
-	int onlyBuyer = 0;
+	int onlyBuyer;
 	char tempName[MAX_LENGTH];
 	char tempPassword[PASSWORD_LENGTH];//const
 	Address* tempAddress;
 
 	cout << "If you want to be also seller press 0, else press 1" << endl;
-	cin >> onlyBuyer;//problem here we dont get the username!!!!!!!!! FIXED
+	cin >> onlyBuyer;
 	cleanBuffer();
 
 	tempAddress = getInfoForNewAllocationOfSellerOrBuyer(tempName, tempPassword);//copy ctor
 	if (!onlyBuyer)
-	{//DOSENT WORK 
+	{
 		BuyerAndSeller tempBuyerSeller(tempName, tempPassword, tempAddress);
-		(*this) += tempBuyerSeller;//add buyer and seller to the usersArray---DOSENT WORK 
+		(*this) += tempBuyerSeller;//add buyer and seller to the usersArray
 	}
 	else
 	{
 		Buyer tempBuyer(tempName, tempPassword, tempAddress);
 		(*this) += tempBuyer;//add buyer to the usersArray
-	}
-	
+	}	
 }
 
 void System::allocateForNewUser()
 {
 	int i;
 	User** tempArray;
+	Seller* S;
+	Buyer* B;
+	BuyerAndSeller* SB;
 	if (logicSizeOfUsersArray >= physicSizeOfUsersArray)
 	{
 		physicSizeOfUsersArray *= 2;
 		tempArray = new User*[physicSizeOfUsersArray];//c'tor
 		for (i = 0; i < logicSizeOfUsersArray; i++)
 		{
-			if(typeid(this->usersArray[i]) == typeid(Seller))
-				tempArray[i] = new Seller(*((Seller**)usersArray)[i]);
-			if (typeid(this->usersArray[i]) == typeid(Buyer))
-				tempArray[i] = new Buyer(*((Buyer**)usersArray)[i]);
-			if (typeid(this->usersArray[i]) == typeid(BuyerAndSeller))
-				tempArray[i] = new BuyerAndSeller(*((BuyerAndSeller**)usersArray)[i]);
+			S= dynamic_cast<Seller*>(usersArray[i]);
+			B= dynamic_cast<Buyer*>(usersArray[i]);
+			SB= dynamic_cast<BuyerAndSeller*>(usersArray[i]);
+
+			if (SB)//object in location i is BuyerAndSeller 
+			tempArray[i] = new BuyerAndSeller(*SB);
+			else if(B)//object in location i is Buyer 
+				tempArray[i] = new Buyer(*B);
+			else //object in location i is Seller 
+				tempArray[i] = new Seller(*S);		
 		}
 		for (i = 0; i < logicSizeOfUsersArray; i++)
 			delete usersArray[i];
@@ -313,7 +320,7 @@ Address* System::getInfoForNewAllocationOfSellerOrBuyer(char* tempName, char*  t
 		cin.getline(tempPassword, PASSWORD_LENGTH);
 	}
 	tempAddress = new Address(addressInfo());//insert address
-	return tempAddress;//returns by ref 
+	return tempAddress;
 }
 
 bool System::checkIfNameIsTaken(char* name)//checks if the new register can use the username he chose or not.
@@ -332,7 +339,7 @@ static bool checkLettersAndNumbersOnly(char* str)
 	int i, size = strlen(str);
 	for (i = 0; i < size; i++)
 	{
-		if ((str[i] < 48) || (str[i] > 57 && str[i] < 65) || (str[i] > 90 && str[i] < 97) || (str[i] > 122))//checking if there is any char that dosent contain a digit or letter 
+		if ((str[i] < '0') || (str[i] > '9' && str[i] < 'A') || (str[i] > 'Z' && str[i] < 'a') || (str[i] > 'z'))//checking if there is any char that dosent contain a digit or letter 
 			return false;
 	}
 	cout << endl;
@@ -388,8 +395,7 @@ Address System::addressInfo()
 
 static bool isStrCorrect(char* str)
 {
-	int i = 0;
-
+	int i = 0 ;
 	while (str[i] != '\0')
 	{
 		if (!isLetter(str[i]))
@@ -401,12 +407,12 @@ static bool isStrCorrect(char* str)
 
 static bool isLetter(char c)
 {
-	if ((c > 64 && c < 91) || (c > 96) && (c < 123)) // c is capital letter or small letter
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a') && (c <= 'z')) // c is capital letter or small letter
 		return true;
 	return false;
 }
 
-static bool isHouseNumberLegal(int num)
+static bool isHouseNumberLegal(int num)//Check if house number is not negative or 0
 {
 	if (num <= 0)
 		return false;
@@ -416,7 +422,7 @@ static bool isHouseNumberLegal(int num)
 
 void System::addNewSeller()
 {
-	int onlySeller = 0;
+	int onlySeller;
 	char tempName[MAX_LENGTH];
 	char tempPassword[PASSWORD_LENGTH];
 	Address* tempAddress;
@@ -445,14 +451,14 @@ void System::addProductToSeller() // seif 3
 	char userName[MAX_LENGTH];
 	char passWord[PASSWORD_LENGTH];
 	int indexOfSeller;
-	int connected;
-	connected = logIn(userName, passWord, indexOfSeller);
+	int connected  = logIn(userName, passWord, indexOfSeller);
+
 	if (connected == BUYER  )	
 		cout << "Only seller can add new Product !" << endl;
 	else if (connected == SELLER || connected == BUYER_AND_SELLER)//connected to seller 
 	{
-		Product product = Product(insertInfoForProduct(((Seller**)usersArray)[indexOfSeller]));
-		(((Seller**)usersArray)[indexOfSeller])->AddToProductList(product);
+		Product product(insertInfoForProduct(dynamic_cast<Seller*>(usersArray[indexOfSeller])));
+		dynamic_cast<Seller*>(usersArray[indexOfSeller])->AddToProductList(product);
 	}	
 }
 
@@ -472,12 +478,12 @@ Product System::insertInfoForProduct(Seller* pSeller)
 	}
 	cout << "Please enter the price of the product: " << name << endl;
 	cin >> price;
-	while (price < 0)
+	while (price <= 0)
 	{
 		cout << "Price is illegal, please enter again: " << name << endl;
 		cin >> price;
 	}
-	return (Product (name, Product::eCategory(category), price, pSeller));//returns as product--ctor
+	return (Product(name, Product::eCategory(category), price, pSeller));//returns as product--ctor
 }
 
 
@@ -496,16 +502,15 @@ void System::addFeedBackToSeller() //seif 4
 		cout << "Only Buyer can add feedback !" << endl;
 	else
 	{
-		logSizeofOrderCart = (((Buyer**)usersArray)[indexOfBuyer])->getLogSizeOfOrderCart();
+		logSizeofOrderCart = dynamic_cast<Buyer*>(usersArray[indexOfBuyer])->getLogSizeOfOrderCart();
 		if (logSizeofOrderCart == 0)
 			cout << "You must purchase product before adding feedback" << endl;
 		else
 		{
 			orderCart = new Order*[logSizeofOrderCart];
-			for (i = 0; i < logSizeofOrderCart; i++)
-			{
-				orderCart[i] = (((Buyer**)usersArray)[indexOfBuyer])->GetOrderCart()[i];
-			}
+			for (i = 0; i < logSizeofOrderCart; i++)			
+				orderCart[i] = dynamic_cast<Buyer*>(usersArray[indexOfBuyer])->GetOrderCart()[i];
+			
 			Seller* seller = chooseSellerForFeedBack(orderCart, logSizeofOrderCart);
 			if (seller != NULL)
 				createFeedBack(seller, userName);
@@ -533,7 +538,7 @@ Seller* System::chooseSellerForFeedBack(Order** orderCart, int& size)
 	return NULL;
 }
 
-int System::searchForProduct(Order** orderCart, int size, char* productName, int& orderIndex)
+int System::searchForProduct(Order** orderCart, int size, char* productName, int& orderIndex)//Search the product at the sellers products array
 {
 	int i, j, sizeOfProductArray;
 	for (i = 0; i < size; i++)
@@ -554,9 +559,8 @@ int System::searchForProduct(Order** orderCart, int size, char* productName, int
 void System::createFeedBack(Seller* seller, char* buyerName)
 {
 	char message[MAX_FEEDBACK_LENGTH];
-	Date date;
 	int day, month, year;
-
+		
 	cout << "Please enter today's date: " << endl;
 	cout << "Day: ";
 	cin >> day;
@@ -569,8 +573,8 @@ void System::createFeedBack(Seller* seller, char* buyerName)
 	cout << endl << "Year: ";
 	cin >> year;
 	checkYear(year);
-
-	date = Date(day, month, year);
+	
+	Date date(day, month, year);
 
 	cout << endl << "Please enter your feedback: " << endl;
 	cleanBuffer();
@@ -625,20 +629,28 @@ void System::addProductToShoppingCart()//seif 5
 		cout << "Only buyer can add products to his shopping cart ! " << endl;
 	else //you are buyer or buyer and seller
 	{
-		cout << "Please enter the name of the seller: " << endl;
+		cout << "Please enter the name of the seller:" << endl;
 		cin.getline(SellerName, MAX_LENGTH);
-		cout << "Please enter the name of the product: " << endl;
-		cin.getline(productName, MAX_LENGTH);
-
-		indexOfSeller = searchForSeller(SellerName);
-		if (indexOfSeller != NONE)
-		{
-			product = new Product(searchForProductOfSpecificSeller(productName, *(((Seller**)usersArray)[indexOfSeller])));
-			(((Buyer**)usersArray)[indexOfBuyer])->AddToShoppingCart(*product);//adding the product to the exact buyer who is currently using the system(logged In)
-			delete product;
-		}
+		if (strcmp(userName, SellerName) == 0)
+			cout << "Can't purchase your own product!" << endl;
 		else
-			cout << "Seller has not been found" << endl;
+		{
+			cout << "Please enter the name of the product: " << endl;
+			cin.getline(productName, MAX_LENGTH);
+
+			indexOfSeller = searchForSeller(SellerName);
+			if (indexOfSeller != NONE)
+			{
+				product = (searchForProductOfSpecificSeller(productName, dynamic_cast<Seller*>(usersArray[indexOfSeller])));
+				if (product)
+				{
+					dynamic_cast<Buyer*>(usersArray[indexOfBuyer])->AddToShoppingCart(*product);//adding the product to the exact buyer who is currently using the system(logged In)
+					delete product;
+				}			
+			}
+			else
+				cout << "Seller has not been found" << endl;
+		}
 	}
 }
 
@@ -653,20 +665,20 @@ int System::searchForSeller(char* name)
 	return index;
 }
 
-Product System::searchForProductOfSpecificSeller(char* productName, Seller seller)
+Product* System::searchForProductOfSpecificSeller(char* productName, Seller* seller)
 {
-	int index = -1;
-	Product **productList = seller.getListOfProducts();
+	int index = NONE;
+	Product **productList = seller->getListOfProducts();
 
-	for (int i = 0; i < seller.getLogListProductSize(); i++)
+	for (int i = 0; i < seller->getLogListProductSize(); i++)
 		if (strcmp(productList[i]->getName(), productName) == 0)
 			index = i;
-	if (index == -1)
+	if (index == NONE)
 	{
 		cout << "Product doesnt exist for this seller " << endl;
-		exit(-1);
+		return NULL;
 	}
-	return *(productList[index]);
+	return productList[index];
 }
 
 
@@ -685,15 +697,15 @@ void System::MakeAnOrder()//seif 6
 		cout << "Only buyer can make an order! " << endl;
 	else //you are buyer or buyer and seller
 	{
-		sizeOfShoppingCart = (((Buyer**)usersArray)[indexOfBuyer])->getLogSizeOfShoppingCart();
+		sizeOfShoppingCart = dynamic_cast<Buyer*>(usersArray[indexOfBuyer])->getLogSizeOfShoppingCart();
 		if (sizeOfShoppingCart == 0)
 			cout << "No products in shopping cart" << endl;
-		else if ((((Buyer**)usersArray)[indexOfBuyer])->getOrder() != NULL)
+		else if (dynamic_cast<Buyer*>(usersArray[indexOfBuyer])->getOrder() != NULL)
 			cout << "The last order is not completed" << endl;
 		else //you can start the order
 		{
-			ShoppingCart = (((Buyer**)usersArray)[indexOfBuyer])->getShoppingCart();
-			addChosenProductsToOrder(sizeOfShoppingCart, (((Buyer**)usersArray)[indexOfBuyer]));
+			ShoppingCart = dynamic_cast<Buyer*>(usersArray[indexOfBuyer])->getShoppingCart();
+			addChosenProductsToOrder(sizeOfShoppingCart, dynamic_cast<Buyer*>(usersArray[indexOfBuyer]));
 		}
 	}
 }
@@ -760,9 +772,9 @@ void System::payForOrder() //seif 7
 		cout << "Only buyer can make an order! " << endl;
 	else //you are buyer or buyer and seller
 	{
-		order = (((Buyer**)usersArray)[indexOfBuyer])->getOrder();
+		order = dynamic_cast<Buyer*>(usersArray[indexOfBuyer])->getOrder();
 		if (order != NULL)
-			finishOrder(order, (((Buyer**)usersArray)[indexOfBuyer]));
+			finishOrder(order, dynamic_cast<Buyer*>(usersArray[indexOfBuyer]));
 		else
 			cout << "You payed for all your orders :)" << endl;
 	}
@@ -870,9 +882,9 @@ void System::SearchForProductExistence(char* productName)
 {
 	for (int i = 0; i < this->logicSizeOfUsersArray; i++)
 	{
-		Product** productListTemp = new Product*[(((Seller**)usersArray)[i])->getPhysicListProductSize()];
-		productListTemp = (((Seller**)usersArray)[i])->getListOfProducts();
-		for (int j = 0; j < (((Seller**)usersArray)[i])->getLogListProductSize(); j++)
+		Product** productListTemp = new Product*[dynamic_cast<Seller*>(usersArray[i])->getPhysicListProductSize()];
+		productListTemp = dynamic_cast<Seller*>(usersArray[i])->getListOfProducts();
+		for (int j = 0; j < dynamic_cast<Seller*>(usersArray[i])->getLogListProductSize(); j++)
 		{
 			if (strcmp(productName, productListTemp[j]->getName()) == 0)//checks if found a product with the exact name 
 				cout << "The Seller number is : " << i + 1 << ", which his name is: " << this->usersArray[i]->getUserName() << " has the product, the price is: " << productListTemp[j]->getPrice() << endl;
@@ -904,19 +916,58 @@ void System::testOperatorCout()
 	cout << "-------------------------------------" << endl;
 	cout << "test FEEDBACK operator" << endl;
 	cout << testFeedback;//test all of operators << made 
+	cout << "-------------------------------------" << endl;
 }
 
 void System::testOperatorCompare()
-{
-	char* nameOne= ("nitzan");
+{	
 	cout << "TEST OF OPERATOR > : " << endl;
 	int i;
+	double priceTestOne = 0, priceTestTwo = 0;
+	Product::eCategory category = (Product::eCategory)0;
 	Buyer testBuyer1("hadar", "12345678", &Address("testCountry", "testCity", "testStreet", 11));
 	Buyer testBuyer2("nitzan", "12345678", &Address("testCountry", "testCity", "testStreet", 11));
+	Seller* testSeller=new Seller("seller", "12345678", &Address("testCountry", "testCity", "testStreet", 11));
+	Product** shopingCartforBuyerOne=new Product*[testSize];
+	Product** shopingCartforBuyerTwo= new Product*[testSize];
+	for (i = 0; i < testSize; i++)
+	{
+		priceTestOne += 2;
+		priceTestTwo += 1;
+		shopingCartforBuyerOne[i] = new Product("testproductBuyerOne", category, priceTestOne, testSeller);
+		shopingCartforBuyerTwo[i] = new Product("testproductBuyerTwo", category, priceTestTwo, testSeller);//second buyer will have a smaller sum 
+	}
+
+	testBuyer1.setShoppingCart(shopingCartforBuyerOne);
+	testBuyer2.setShoppingCart(shopingCartforBuyerTwo);
+	testBuyer1.setLogSizeOfShoppingCart(testSize);
+	testBuyer2.setLogSizeOfShoppingCart(testSize);
+	testBuyer1.setPhysicSizeOfShoppingCart(testSize);
+	testBuyer2.setPhysicSizeOfShoppingCart(testSize);
+	printTest(testBuyer1, testBuyer2);
+	delete testSeller;
 }
 
 
-void System::operator+=(const Buyer& other)//might be a prob because of & 
+void System:: printTest(Buyer& buyerOne, Buyer& buyerTwo)
+{
+	cout << "if the test works, buyer number one should be bigger then buyer two" << endl;
+	cout << "is buyer one bigger then buyer two??" << endl;
+	if (buyerOne > buyerTwo == true)
+		cout << "Yes" << endl;
+	else
+		cout << "No" << endl;
+	cout << "-------------------------------------" << endl;
+	cout << "is buyer two bigger then buyer One??" << endl;
+
+	if (buyerOne > buyerTwo == false)
+		cout << "Yes" << endl;
+	else
+		cout << "No" << endl;
+
+}
+
+void System::operator+=(const Buyer& other)
 {
 	this->allocateForNewUser();//allocation
 	if (logicSizeOfUsersArray == 1)//allocate
@@ -932,11 +983,10 @@ void System::operator+=(const Seller& other)
 	this->usersArray[logicSizeOfUsersArray - 1] = new Seller(other);
 }
 
-void System::operator+=(const BuyerAndSeller& other)//DOSENT WORKKKKKKKKKK
+void System::operator+=(const BuyerAndSeller& other)
 {
 	this->allocateForNewUser();//allocation
 	if (logicSizeOfUsersArray == 1)//allocate
 		usersArray = new User*[physicSizeOfUsersArray];
 	this->usersArray[logicSizeOfUsersArray - 1] = new BuyerAndSeller(other);
 }
-

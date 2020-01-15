@@ -1,7 +1,7 @@
 #include "product.h"
 int Product::counter = 0;
 
-Product::Product(char* name, eCategory category, double price, Seller* seller)//constructor
+Product::Product(char* name, eCategory category, double& price, Seller*& seller)//constructor
 {
 	if (name)//!=NULL
 		strcpy(this->name, name);
@@ -22,6 +22,7 @@ Product::Product(const Product& other)//copy c'tor
 
 Product::~Product() //destructor
 {
+	
 	seller = NULL;	
 }
 

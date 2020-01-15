@@ -25,7 +25,7 @@ private:
 	static int counter;
 
 public:
-	Product(char* name = NULL, eCategory category = (eCategory)0, double price = 0, Seller* seller = NULL); //constructor
+	Product(char* name, eCategory category , double& price, Seller*& seller); //constructor
 	Product(const Product& other);//copy c'tor 
 	~Product(); //destructor
 

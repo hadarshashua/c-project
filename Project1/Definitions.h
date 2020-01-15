@@ -9,6 +9,6 @@
 #define BUYER 1
 #define BUYER_AND_SELLER 2
 #define NONE -1
-
+#define testSize 5 
 
 #endif // !Definitions_H

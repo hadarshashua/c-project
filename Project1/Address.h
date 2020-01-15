@@ -31,10 +31,7 @@ public:
 	const char* getStreet() const;
 	int getHouseNumber()const;
 
-
-
 	friend ostream& operator<<(ostream& os, const Address& address);
-
 };
 
 #endif // !Address_H

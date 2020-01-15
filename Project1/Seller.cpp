@@ -7,8 +7,6 @@ static bool passwordInCorrectLength(char* pass);
 
 Seller::Seller(char* userName, char* password, Address* address, FeedBack** feedBackArray, Product** listOfProducts, int logListProductSize, int physicListProductSize, int logSizeOfFeedbackArray, int physicSizeOfFeedbackArray) : User(userName, password, address)//constructor
 {
-	cout << "test ctor seller" << endl;
-
 	this->feedbackArray = feedBackArray;
 	this->listOfProducts = listOfProducts;
 	this->logListProductSize = logListProductSize;
@@ -19,8 +17,6 @@ Seller::Seller(char* userName, char* password, Address* address, FeedBack** feed
 
 Seller::Seller(const Seller& other) : User(other)//copy ctor
 {
-	cout << "test copy seller" << endl;
-
 	this->feedbackArray = new FeedBack*[other.getLogSizeOfFeedbackArray()];// c'tor of feedBack
 	for (int i = 0; i < other.getLogSizeOfFeedbackArray(); i++)
 		this->feedbackArray[i] = new FeedBack(*(other.feedbackArray[i]));//copy ctor 
@@ -38,8 +34,6 @@ Seller::Seller(const Seller& other) : User(other)//copy ctor
 
 Seller::Seller(Seller&& other) : User(other)//move c'tor
 {
-	cout << "test move seller" << endl;
-
 	feedbackArray = other.feedbackArray;
 	other.feedbackArray = NULL;
 
@@ -55,8 +49,6 @@ Seller::Seller(Seller&& other) : User(other)//move c'tor
 
 Seller:: ~Seller()//destructor
 {
-	cout << "test dtor seller" << endl;
-
 	for (int i = 0; i<this->logSizeOfFeedbackArray; i++)
 		delete feedbackArray[i];
 	delete[]feedbackArray;
@@ -68,7 +60,6 @@ Seller:: ~Seller()//destructor
 
 void Seller::setFeedbackArray(FeedBack** feedBackArray, int& logSize)
 {
-
 	this->feedbackArray = new FeedBack*[logSize];
 	for (int i = 0; i < logSize; i++)
 		this->feedbackArray[i] = new FeedBack(*(feedBackArray[i]));//copy ctor 
@@ -138,7 +129,7 @@ int Seller::getPhysicSizeOfFeedbackArray() const
 }
 
 
-void Seller::AddToProductList(Product newProduct)
+void Seller::AddToProductList(Product& newProduct)//Add new product for the seller
 {
 	allocateProductArray();
 	if (logListProductSize == 1)
@@ -146,7 +137,7 @@ void Seller::AddToProductList(Product newProduct)
 	listOfProducts[logListProductSize - 1] = new Product(newProduct);
 }
 
-void Seller::allocateProductArray()//dosent work 
+void Seller::allocateProductArray()
 {
 	int i;
 	Product** TempProductList;
@@ -158,13 +149,20 @@ void Seller::allocateProductArray()//dosent work
 			TempProductList[i] = new Product(*(listOfProducts[i]));//copy c'tor 
 		for (i = 0; i < logListProductSize; i++)
 			delete listOfProducts[i];
-		if(logListProductSize!=0)//wasent empty array ------i Added this cuz it wont work without it 
-		delete[]listOfProducts;//dosent work 
+		delete[]listOfProducts;
 		listOfProducts = TempProductList;
 	}
 	logListProductSize++;
 }
 
+
+void Seller::addFeedbackToSeller(FeedBack feedback)
+{
+	allocateForNewFeedback();
+	if (logSizeOfFeedbackArray == 1)
+		this->feedbackArray = new FeedBack*[physicSizeOfFeedbackArray];
+	feedbackArray[logSizeOfFeedbackArray - 1] = new FeedBack(feedback);
+}
 
 void Seller::allocateForNewFeedback()
 {
@@ -182,12 +180,4 @@ void Seller::allocateForNewFeedback()
 		feedbackArray = tempArray;
 	}
 	logSizeOfFeedbackArray++;
-}
-
-void Seller::addFeedbackToSeller(FeedBack feedback)
-{
-	allocateForNewFeedback();
-	if (logSizeOfFeedbackArray == 1)
-		this->feedbackArray = new FeedBack*[physicSizeOfFeedbackArray];
-	feedbackArray[logSizeOfFeedbackArray - 1] = new FeedBack(feedback);
 }

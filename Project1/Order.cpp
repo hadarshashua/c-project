@@ -10,7 +10,7 @@ Order::Order(const char* buyerName, double totalSumCost, Product** productsArray
 	this->physicProductsArraySize = physicProductsArraySize;
 }
 
-Order::Order(const Order& other)
+Order::Order(const Order& other)//copy c'tor
 {	
 	this->totalSumCost = other.getTotalSumCost();
 	this->productsArray = new Product*[other.getLogicProductsArraySize()];
@@ -82,7 +82,7 @@ int  Order::getPhysicProductsArraySize() const
 }
 
 
-void Order::addProduct(Product& product)
+void Order::addProduct(Product& product)//Add product to order
 {	
 	allocateProductList();
 	if (logicProductsArraySize == 1)
@@ -109,7 +109,7 @@ void Order::allocateProductList()
 	logicProductsArraySize++;
 }
 
-void Order::updateTotalSumCost()
+void Order::updateTotalSumCost()//Calculate the cost of order
 {
 	double sumCost = 0;
 	int i;

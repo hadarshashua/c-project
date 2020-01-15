@@ -1,7 +1,7 @@
 #include "Date.h"
 
 
-Date::Date(int day, int month, int year) // constructor
+Date::Date(const int& day,const int& month,const int& year) // constructor
 {
 	setDate(day, month, year);
 }

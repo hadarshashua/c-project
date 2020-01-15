@@ -4,10 +4,8 @@ static bool checkLettersAndNumbersOnly(const char* str);
 static bool userNameAboveMinSize(const char* name);
 static bool passwordInCorrectLength(const char* pass);
 
-User::User(const char* userName, const char* password, const Address* address)//constructor
+User::User(char* userName, const char* password, Address* address)//constructor
 {
-	cout << "test ctor user" << endl;
-
 	strcpy(this->userName, userName);
 	strcpy(this->password, password);
 	this->address = new Address(*address);
@@ -15,8 +13,6 @@ User::User(const char* userName, const char* password, const Address* address)//
 
 User::User(const User& other)//copy c'tor
 {
-	cout << "test copy user" << endl;
-
 	strcpy(this->userName, other.userName);//copying Other username
 	strcpy(this->password, other.password);//copying Other password
 	this->address = new Address(*other.address);//copy c'tor 
@@ -24,8 +20,6 @@ User::User(const User& other)//copy c'tor
 
 User::User(User&& other)//move c'tor
 {
-	cout << "test move user" << endl;
-
 	strcpy(this->userName, other.userName);
 	other.setUserName(NULL);
 	strcpy(this->password, other.password);
@@ -37,8 +31,6 @@ User::User(User&& other)//move c'tor
 
 User::~User()//destructor
 {
-	cout << "test dtor user" << endl;
-
 	delete address;
 }
 
@@ -95,7 +87,7 @@ static bool checkLettersAndNumbersOnly(const char* str)
 	return true;
 }
 
-static bool userNameAboveMinSize(const char* name)
+static bool userNameAboveMinSize(const char* name)//Check if user name is not longer than 20 letters
 {
 	int size = strlen(name);
 	if (size >= 6)
@@ -103,7 +95,7 @@ static bool userNameAboveMinSize(const char* name)
 	return false;
 }
 
-static bool passwordInCorrectLength(const char* pass)
+static bool passwordInCorrectLength(const char* pass)//Check if password has exactly 8 characters
 {
 	int size = strlen(pass);
 	if (size == PASSWORD_LENGTH-1)

@@ -36,7 +36,7 @@ public:
 	void setPhysicSizeOfShoppingCart(int physicSizeOfShoppingCart);
 
 	Order* getOrder();
-	Order** GetOrderCart();//shows the list of everything youve got in the cart, Once you choose an item in the cart it will ask you how many of that item would you like , once you choose it , it will be added to the sum that you need to pay , and the item will be deleted from the list( dont have realloc..)
+	Order** GetOrderCart();//shows the list of everything youve got in the cart, Once you choose an item in the cart it will ask you how many of that item would you like , once you choose it , it will be added to the sum that you need to pay , and the item will be deleted from the list
 	int getLogSizeOfOrderCart() const;
 	int getPhysicSizeOfOrderCart() const;
 	Product** getShoppingCart();
@@ -47,13 +47,8 @@ public:
 	void allocateShoppingCart();
 	void AddToOrderCart(Order* newOrder);
 	void allocateOrderCart();
-
-
-
-//const	Buyer& operator+=(const Buyer& other);//add--NEED THIS ?
-const bool operator>(const Buyer& other);//comparing
-
-
+	
+	const bool operator>(const Buyer& other);//comparing
 };
 
 #endif // !Buyer_H

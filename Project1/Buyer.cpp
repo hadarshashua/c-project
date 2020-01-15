@@ -2,8 +2,6 @@
 
 Buyer::Buyer(char* userName, char* password, Address* address, Order* order, Order** orderCart, Product** shoppingCart, int logSizeOfShoppingCart, int physicSizeOfShoppingCart, int logSizeOfOrderCart, int  physicSizeOfOrderCart) : User(userName, password, address)//c'tor default  --zero all
 {
-	cout << "test ctor buyer" << endl;
-
 	this->order = order;
 	this->orderCart = orderCart;
 	this->shoppingCart = shoppingCart;
@@ -15,16 +13,15 @@ Buyer::Buyer(char* userName, char* password, Address* address, Order* order, Ord
 
 Buyer::Buyer(const Buyer& other) : User(other)// copy c'tor
 {
-	cout << "test copy buyer" << endl;
-
 	int i;
 	if(other.order!=NULL)//not empty
-	this->order = new Order(*(other.order));
-	this->orderCart = new Order*[other.getLogSizeOfOrderCart()];
+		this->order = new Order(*(other.order));
+	if (other.orderCart != NULL)
+		this->orderCart = new Order*[other.getPhysicSizeOfOrderCart()];
 	for (i = 0; i < other.getLogSizeOfOrderCart(); i++)
 		this->orderCart[i] = new Order(*(other.orderCart[i]));//copying the cart
 
-	this->shoppingCart = new Product*[other.getLogSizeOfShoppingCart()];
+	this->shoppingCart = new Product*[other.getPhysicSizeOfShoppingCart()];
 	for (i = 0; i < other.getLogSizeOfShoppingCart(); i++)
 		this->shoppingCart[i] = new Product(*(other.shoppingCart[i]));
 
@@ -37,8 +34,6 @@ Buyer::Buyer(const Buyer& other) : User(other)// copy c'tor
 
 Buyer::Buyer(Buyer && other) : User(other)//move ctor
 {
-	cout << "test move buyer" << endl;
-
 	this->order = other.order;
 	other.order = NULL;
 
@@ -57,8 +52,6 @@ Buyer::Buyer(Buyer && other) : User(other)//move ctor
 
 Buyer::~Buyer()//destructor
 {
-	cout << "test dtor buyer" << endl;
-
 	int i;
 	delete order;
 	for (i = 0; i<this->getLogSizeOfOrderCart(); i++)
@@ -141,7 +134,7 @@ int Buyer::getPhysicSizeOfShoppingCart() const
 	return physicSizeOfShoppingCart;
 }
 
-void Buyer::AddToOrderCart(Order* newOrder)
+void Buyer::AddToOrderCart(Order* newOrder) //Add new order to orders history array
 {
 	allocateOrderCart();
 	if (logSizeOfOrderCart == 1)
@@ -167,7 +160,7 @@ void Buyer::allocateOrderCart()
 	logSizeOfOrderCart++;
 }
 
-void Buyer::AddToShoppingCart(Product&  newProduct)
+void Buyer::AddToShoppingCart(Product&  newProduct)//Add new product to shopping cart
 {
 	allocateShoppingCart();
 	if (logSizeOfShoppingCart == 1)
