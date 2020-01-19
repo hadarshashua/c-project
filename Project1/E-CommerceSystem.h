@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include "Definitions.h"
@@ -22,6 +23,7 @@ public:
 	System(User** usersArray = NULL, int logicSizeOfUsersArray = 0, int physicSizeOfUsersArray = 1); //constructor
 	~System(); //destructor
 
+	
 	void setUsersArray(User** user);
 	void setLogicSizeOfUsersArray(int size);
 	void setPhysicSizeOfUsersArray(int size);
@@ -31,6 +33,8 @@ public:
 	int getPhysicSizeOfUsersArray();
 
 	void systemRun();
+	void writeInfoToFile(char* fileName);
+	void getInfoFromFile(ifstream& inFile);
 	void cleanBuffer();
 	int logIn(char* userName, char* passWord, int& index);
 	int checkIfUserNameExist(char* userName, int& index);

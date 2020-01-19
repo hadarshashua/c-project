@@ -31,7 +31,21 @@ public:
 	const char* getStreet() const;
 	int getHouseNumber()const;
 
-	friend ostream& operator<<(ostream& os, const Address& address);
+	friend ostream& operator<<(ostream& out, const Address& address)
+	{
+		if (typeid(out) == typeid(ofstream))
+			out << address.country << " " << address.city << " " << address.street << " " << address.houseNumber;
+		else
+			out << "Country: " << address.country << "\n City: " << address.city << "\n Street: " << address.street << "\n House number: " << address.houseNumber << endl;
+		return out;
+	}
+
+	friend  istream& operator>> (istream& in, Address& address)
+	{
+//		char delimiter;
+		in >> address.country >> address.city >> address.street >> address.houseNumber;
+		return in;
+	}
 };
 
 #endif // !Address_H

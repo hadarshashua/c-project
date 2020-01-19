@@ -100,10 +100,3 @@ bool isLetter(char c)
 		return true;
 	return false;
 }
-
-ostream & operator<<(ostream & os, const Address & address)
-{
-	os << "State is: " << address.getCountry() << "\n" << "city is: " << address.getCity() << "\n" << "street is: " << address.getStreet() << "\n" << "house number is:" << address.getHouseNumber() << endl;
-	
-	return os;//support operator overload
-}

@@ -83,5 +83,8 @@
     <ClInclude Include="User.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Array.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

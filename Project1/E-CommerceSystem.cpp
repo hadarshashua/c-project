@@ -63,6 +63,16 @@ int System::getPhysicSizeOfUsersArray()
 void System::systemRun()
 {
 	int choice = 0;
+	char fileName[MAX_LENGTH];
+	cout << "Please enter the file name: " << endl;
+	cin.getline(fileName, MAX_LENGTH);
+
+	ifstream inFile(fileName);
+	if (!inFile.fail())//check if file exist 
+		getInfoFromFile(inFile);
+	else
+		cout << "The file has not found" << endl;
+
 	while (choice != EXIT)
 	{
 		printMenu();
@@ -118,12 +128,54 @@ void System::systemRun()
 				checkOperators();
 				break;
 			case 14:
+				writeInfoToFile(fileName);
 				break;//for exit
 			default:
 				break;
 			}
 		}
 	}
+}
+
+
+void System::writeInfoToFile(char* fileName)
+{
+	ofstream outFile(fileName, ios::trunc);
+
+	outFile << logicSizeOfUsersArray << endl;
+	for (int i = 0; i < logicSizeOfUsersArray; i++)
+	{
+		outFile << typeid(*(usersArray[i])).name() + 6 << " " << *(usersArray[i]) << endl;
+	}
+	outFile.close();
+}
+
+void System::getInfoFromFile(ifstream& inFile)
+{
+	int logSize, i;
+	char userName[MAX_LENGTH];
+	char password[PASSWORD_LENGTH];
+	char type[MAX_LENGTH];
+	Address address("temp","temp","temp",1);
+
+	inFile >> logSize; //Get from file the amount of users
+	this->usersArray = new User*[logSize];
+	this->setLogicSizeOfUsersArray(logSize);
+	this->setPhysicSizeOfUsersArray(logSize);
+
+	for (i = 0; i < logSize; i++)
+	{
+		inFile >> type; //Get from file the type of user
+		inFile >> userName >> password >> address; //Get from file the user's info
+		if (strcmp(type, typeid(BuyerAndSeller).name() + 6) == 0)//The user is a buyer and seller
+			this->usersArray[i] = new BuyerAndSeller(userName, password, &address);
+		else if (strcmp(type, typeid(Seller).name() + 6) == 0)//The user is a seller
+			this->usersArray[i] = new Seller(userName, password, &address);
+		else if (strcmp(type, typeid(Buyer).name() + 6) == 0)//The user is a buyer
+			this->usersArray[i] = new Buyer(userName, password, &address);		
+	}
+
+	inFile.close();
 }
 
 static void printMenu()
@@ -172,7 +224,7 @@ int System::logIn(char* userName, char* passWord, int& index)//	THE LOGIN FUNCTI
 	{
 		if (!checkIfUserPasswordCorrect(index, passWord))
 		{
-			cout << "Password is incorrect  " << endl;
+			cout << "Password is incorrect" << endl;
 			return NONE;
 		}
 		return BUYER;
@@ -521,7 +573,7 @@ void System::addFeedBackToSeller() //seif 4
 Seller* System::chooseSellerForFeedBack(Order** orderCart, int& size)
 {
 	int orderIndex;
-	Product** productList;
+	Array<Product*> productList;
 	char productName[MAX_LENGTH];
 	cout << "Please enter the name of the product for feedback: " << endl;
 	cin.getline(productName, MAX_LENGTH);
@@ -529,9 +581,10 @@ Seller* System::chooseSellerForFeedBack(Order** orderCart, int& size)
 	int productIndex = searchForProduct(orderCart, size, productName, orderIndex);
 	if (productIndex != NONE)
 	{
-		productList = new Product*[orderCart[orderIndex]->getPhysicProductsArraySize()];
+		//productList = new Product*[orderCart[orderIndex]->getProductsArray().getLogSize()];
 		productList = orderCart[orderIndex]->getProductsArray();
-		return productList[productIndex]->getSeller();
+		//return productList[productIndex]->getSeller();
+		return productList.getArrByIndex(productIndex)->getSeller();
 	}
 	else
 		cout << "Product has not been found" << endl;
@@ -543,10 +596,12 @@ int System::searchForProduct(Order** orderCart, int size, char* productName, int
 	int i, j, sizeOfProductArray;
 	for (i = 0; i < size; i++)
 	{
-		sizeOfProductArray = orderCart[i]->getLogicProductsArraySize();
+		//sizeOfProductArray = orderCart[i]->getLogicProductsArraySize();
+		sizeOfProductArray = orderCart[i]->getProductsArray().getLogSize();
+
 		for (j = 0; j < sizeOfProductArray; j++)
 		{
-			if (strcmp(orderCart[i]->getProductsArray()[j]->getName(), productName) == 0)
+			if (strcmp(orderCart[i]->getProductsArray().getArrByIndex(i)->getName(), productName) == 0)
 			{
 				orderIndex = i;
 				return j;
@@ -728,13 +783,12 @@ void System::addChosenProductsToOrder(int shoppingCartSize, Buyer* buyer)
 		cin >> answer;
 		if (answer == true)
 		{
-			(*buyer).getOrder()->addProduct(*(shoppingCart[i]));
+			(*buyer).getOrder()->addProduct((shoppingCart[i]));
 			removeProductFromShoppingCart(buyer, shoppingCart, shoppingCartSize, shoppingCart[i], i);
 			cout << "Product added" << endl;
 			shoppingCartSize--;
 			i--;
 		}
-		cout << shoppingCartSize << endl;
 	}
 }
 
@@ -808,7 +862,7 @@ void System::showAllBuyers()//seif 8
 	{
 		if (typeid(*(usersArray[i])) == typeid(Buyer))
 		{
-			cout << "Username number :" << i + 1 << "'s buyer is :" << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
+			cout << "Username number : " << i + 1 << "'s buyer is : " << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
 			countBuyers++;
 		}
 	}
@@ -826,7 +880,7 @@ void System::showAllSellers()//seif 9
 	{
 		if (typeid(*(usersArray[i])) == typeid(Seller))
 		{
-			cout << "Username number :" << i + 1 << "'s seller is :" << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
+			cout << "Username number : " << i + 1 << "'s seller is : " << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
 			countSellers++;
 		}
 	}
@@ -844,7 +898,7 @@ void System::showAllBuyersAndSellers()//seif 10
 	{
 		if (typeid(*(usersArray[i])) == typeid(BuyerAndSeller))
 		{
-			cout << "Username number :" << i + 1 << "   buyerAndSeller name is:" << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
+			cout << "Username number : " << i + 1 << "   buyerAndSeller name is : " << this->usersArray[i]->getUserName() << " and his password is : " << this->usersArray[i]->getPassword() << endl;
 			countBuyersAndSellers++;
 		}
 	}

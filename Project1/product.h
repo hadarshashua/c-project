@@ -39,6 +39,8 @@ public:
 	double getPrice()const;
 	int getSerialNumber()const;
 	Seller* getSeller() const;
+
+	const Product& operator=(const Product& other);
 };
 
 #endif // !Product_H

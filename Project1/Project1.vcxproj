@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Address.h" />
+    <ClInclude Include="Array.h" />
     <ClInclude Include="Buyer.h" />
     <ClInclude Include="BuyerAndSeller.h" />
     <ClInclude Include="Date.h" />

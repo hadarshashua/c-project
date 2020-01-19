@@ -76,3 +76,18 @@ Seller* Product::getSeller() const
 {
 	return this->seller;
 }
+
+
+const Product& Product:: operator=(const Product& other)
+{
+	if (this != &other)
+	{
+		strcpy(this->name, other.name);
+		this->category = other.category;
+		this->price = other.price;
+		this->serial_number = other.serial_number;
+		this->seller = other.seller;
+		this->counter = other.counter;
+	}
+	return *this;
+}

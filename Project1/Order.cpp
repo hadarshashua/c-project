@@ -1,34 +1,30 @@
 #include "Order.h"
 
-Order::Order(const char* buyerName, double totalSumCost, Product** productsArray, int logicProductsArraySize , int physicProductsArraySize ) //constructor
+Order::Order(const char* buyerName, double totalSumCost, Array<Product*> productsArray, int logicProductsArraySize, int physicProductsArraySize) //constructor
 {
-	if(buyerName!=NULL)
+	if (buyerName != NULL)
 		strcpy(this->buyerName, buyerName);
 	this->totalSumCost = totalSumCost;
 	this->productsArray = productsArray;
-	this->logicProductsArraySize = logicProductsArraySize;
-	this->physicProductsArraySize = physicProductsArraySize;
+	//this->logicProductsArraySize = logicProductsArraySize;
+	//this->physicProductsArraySize = physicProductsArraySize;
 }
 
 Order::Order(const Order& other)//copy c'tor
-{	
+{
 	this->totalSumCost = other.getTotalSumCost();
-	this->productsArray = new Product*[other.getLogicProductsArraySize()];
-	for (int i = 0; i < other.getLogicProductsArraySize(); i++)
-		this->productsArray[i] = other.getProductsArray()[i];
-	this->physicProductsArraySize = other.getPhysicProductsArraySize();
-	this->logicProductsArraySize = other.getLogicProductsArraySize();
+	this->productsArray = other.productsArray;
+	//this->physicProductsArraySize = other.getPhysicProductsArraySize();
+	//this->logicProductsArraySize = other.getLogicProductsArraySize();
 }
 
 Order::~Order() //destructor
 {
-	for(int i=0;i<logicProductsArraySize;i++)
-		delete productsArray[i];
-	delete[]productsArray;
+	cout << "order destructor!" << endl;
 }
 
 
-void Order::setBuyerName(char* buyerName)
+void Order::setBuyerName(const char*& buyerName)
 {
 	strcpy(this->buyerName, buyerName);
 }
@@ -39,85 +35,84 @@ void Order::setTotalSumCost(double totalSumCost)
 	this->totalSumCost = totalSumCost;
 }
 
-void Order::setProductsArray(Product** productsArray)
+void Order::setProductsArray(Array <Product*> productsArray)
 {
 	this->productsArray = productsArray;
 }
-
-void  Order::setLogicProductsArraySize(int logicProductsArraySize)
+/*
+void  Order::setLogicProductsArraySize(const int& logicProductsArraySize)
 {
-	this->logicProductsArraySize = logicProductsArraySize;
+this->logicProductsArraySize = logicProductsArraySize;
 }
 
-void  Order::setPhysicProductsArraySize(int physicProductsArraySize)
+void  Order::setPhysicProductsArraySize(const int& physicProductsArraySize)
 {
-	this->physicProductsArraySize = physicProductsArraySize;
+this->physicProductsArraySize = physicProductsArraySize;
 }
 
-
+*/
 const char* Order::getBuyerName() const
 {
 	return buyerName;
 }
-
 
 double Order::getTotalSumCost() const
 {
 	return totalSumCost;
 }
 
-Product** Order::getProductsArray() const
+Array<Product*> Order::getProductsArray() const
 {
 	return productsArray;
 }
 
-int  Order::getLogicProductsArraySize() const
+/*
+const int&  Order::getLogicProductsArraySize() const
 {
-	return logicProductsArraySize;
+return  productsArray.getLogSize;
 }
 
-int  Order::getPhysicProductsArraySize() const
+const int&  Order::getPhysicProductsArraySize()
 {
-	return physicProductsArraySize;
+return productsArray.getPhysicalSize();
+}
+*/
+
+void Order::addProduct(Product*& product)//Add product to order
+{
+	productsArray += product;
 }
 
-
-void Order::addProduct(Product& product)//Add product to order
-{	
-	allocateProductList();
-	if (logicProductsArraySize == 1)
-		productsArray = new Product*[physicProductsArraySize];		
-	productsArray[logicProductsArraySize - 1] = new Product(product);//copy ctor 
-}
-
-
+/*
 void Order::allocateProductList()
 {
-	int i;
-	Product** tempArray;
-	if (logicProductsArraySize >= physicProductsArraySize)
-	{
-		physicProductsArraySize *= 2;
-		tempArray = new Product*[physicProductsArraySize];
-		for (i = 0; i < logicProductsArraySize; i++)		
-			tempArray[i] = new Product(*(this->productsArray[i]));		
-		for (i = 0; i < logicProductsArraySize; i++)
-			delete productsArray[i];
-		delete[]productsArray;
-		productsArray = tempArray;
-	}
-	logicProductsArraySize++;
+int i;
+Product** tempArray;
+if (logicProductsArraySize >= physicProductsArraySize)
+{
+physicProductsArraySize *= 2;
+tempArray = new Product*[physicProductsArraySize];
+for (i = 0; i < logicProductsArraySize; i++)
+tempArray[i] = new Product(*(this->productsArray[i]));
+for (i = 0; i < logicProductsArraySize; i++)
+delete productsArray[i];
+delete[]productsArray;
+productsArray = tempArray;
 }
+logicProductsArraySize++;
+}
+*/
 
 void Order::updateTotalSumCost()//Calculate the cost of order
 {
 	double sumCost = 0;
-	int i;
-	double productPrice;
+	int i, logicProductsArraySize = productsArray.getLogSize();
+	//Product* productsArray = dynamic_cast<Product*>(productsArray.getArr());
 	for (i = 0; i < logicProductsArraySize; i++)
 	{
-		productPrice = this->productsArray[i]->getPrice();
-		sumCost += productPrice;
+		//	productPrice = productsArray.getArr()[i]->getPrice();
+		//sumCost += productsArray.getArr(i)->getPrice();
+		sumCost += productsArray.getArrByIndex(i)->getPrice();
 	}
 	this->totalSumCost = sumCost;
 }
